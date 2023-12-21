@@ -15,7 +15,6 @@ namespace liberacao_credito.Controllers
 {
     public class FinanciamentoController : Controller
     {
-        private readonly DataContext _context;
         private readonly FinanciamentoService _service;
         private static bool isSuccess = false;
         private decimal _totalCJuros;
@@ -58,11 +57,11 @@ namespace liberacao_credito.Controllers
         {
             if (ModelState.IsValid)
             {
-                var validacaoCredito = ValidarFinanciamento(financiamento);
+                var validacaoCredito = _service.ValidarFinanciamento(financiamento);
 
                 if (validacaoCredito.Any())
                 {
-                    ViewBag.FinanciamentoAnalise = validacaoCredito;
+                    ViewBag.ErrorMsg = validacaoCredito;
                     ViewBag.isSuccess = false;
                     PreencherDadosDropDownLists(financiamento);
                     return View(financiamento);
@@ -150,6 +149,7 @@ namespace liberacao_credito.Controllers
         }
 
         #region "custom" 
+
         private void PreencherDadosDropDownLists(Financiamento financiamento)
         {
             ViewData["CPF"] = _service.RetornaListaView(financiamento.CPF);
@@ -161,46 +161,8 @@ namespace liberacao_credito.Controllers
             var dict = _service.RetornaListaView();
             ViewData["CPF"] = dict.First(p => p.Key == "CPF").Value;
             ViewData["TipoCreditoId"] = dict.First(p => p.Key == "TipoCreditoId").Value;
-        }
-
-        public class FinanciamentoAnalise
-        {
-            public string ErrorMsg { get; set; }
-
-            public FinanciamentoAnalise(string errorMsg)
-            {
-                ErrorMsg = errorMsg;
-            }
-        }
-        private List<FinanciamentoAnalise> ValidarFinanciamento(Financiamento financiamento)
-        {
-            var errors = new List<FinanciamentoAnalise>();
-
-            if (financiamento.ValorTotal > 1000000)
-            {
-                errors.Add(new FinanciamentoAnalise("O valor máximo a ser liberado para qualquer tipo de empréstimo é de R$ 1.000.000,00."));
-            }
-
-            if (financiamento.QtdParcelas < 5 || financiamento.QtdParcelas > 72)
-            {
-                errors.Add(new FinanciamentoAnalise("A quantidade de parcelas deve ser entre 5 e 72."));
-            }
-
-            if (financiamento.TipoCreditoId == 3 && financiamento.ValorTotal < 15000)
-            {
-                errors.Add(new FinanciamentoAnalise("Para pessoa jurídica, o valor mínimo a ser liberado é de R$ 15.000,00."));
-            }
-
-            var dataMinima = DateTime.Now.AddDays(15);
-            var dataMaxima = DateTime.Now.AddDays(40);
-
-            if (financiamento.DataVencimentoPrimeiro.Date < dataMinima.Date || financiamento.DataVencimentoPrimeiro.Date > dataMaxima.Date)
-            {
-                errors.Add(new FinanciamentoAnalise($"A data do primeiro vencimento deve estar entre {dataMinima.ToShortDateString()} e {dataMaxima.ToShortDateString()}."));
-            }
-
-            return errors;
-        }
+        }      
+        
         #endregion
     }
 }

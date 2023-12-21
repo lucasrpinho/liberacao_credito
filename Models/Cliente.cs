@@ -5,6 +5,8 @@ namespace liberacao_credito.Models
     public class Cliente
     {
 
+        private string _telefone;
+
         public Cliente() { }
         public Cliente(string cpf, string nome, string uf, string telefone)
         {
@@ -26,7 +28,21 @@ namespace liberacao_credito.Models
         public string UF { get; set; }
 
         [Required]
-        public string Telefone { get; set; }
+        [Display(Name = "Telefone")]
+        [DataType(DataType.PhoneNumber)]
+        [RegularExpression(@"^\(\d{2}\) \d{5}-\d{4}$", ErrorMessage = "O formato do telefone deve ser (99) 99999-9999")]
+        public string Telefone
+        {
+            get
+            {
+                if (!string.IsNullOrEmpty(_telefone) && _telefone.Length == 11)
+                {
+                    return $"({_telefone.Substring(0, 2)}) {_telefone.Substring(2, 5)}-{_telefone.Substring(7)}";
+                }
+                return _telefone;
+            }
+            set { _telefone = value; }
+        }
         public ICollection<Financiamento>? Financiamento { get; set; }
     }
 }

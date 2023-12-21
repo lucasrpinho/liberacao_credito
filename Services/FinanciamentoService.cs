@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using System.ComponentModel.DataAnnotations;
 
 namespace liberacao_credito.Services
 {
@@ -188,6 +189,36 @@ namespace liberacao_credito.Services
         {
             var result = _ctx.Financiamentos.Include(f => f.Cliente).Include(f => f.TipoCredito);
             return result;
+        }
+
+        public List<string> ValidarFinanciamento(Financiamento financiamento)
+        {
+            var ErrorMsg = new List<string>();
+
+            if (financiamento.ValorTotal > 1000000)
+            {
+                ErrorMsg.Add("O valor máximo a ser liberado para qualquer tipo de empréstimo é de R$ 1.000.000,00.");
+            }
+
+            if (financiamento.QtdParcelas < 5 || financiamento.QtdParcelas > 72)
+            {
+                ErrorMsg.Add("A quantidade de parcelas deve ser entre 5 e 72.");
+            }
+
+            if (financiamento.TipoCreditoId == 3 && financiamento.ValorTotal < 15000)
+            {
+                ErrorMsg.Add("Para pessoa jurídica, o valor mínimo a ser liberado é de R$ 15.000,00.");
+            }
+
+            var dataMinima = DateTime.Now.AddDays(15);
+            var dataMaxima = DateTime.Now.AddDays(40);
+
+            if (financiamento.DataVencimentoPrimeiro.Date < dataMinima.Date || financiamento.DataVencimentoPrimeiro.Date > dataMaxima.Date)
+            {
+                ErrorMsg.Add($"A data do primeiro vencimento deve estar entre {dataMinima.ToShortDateString()} e {dataMaxima.ToShortDateString()}.");
+            }
+
+            return ErrorMsg;
         }
     }
 }

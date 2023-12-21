@@ -3,7 +3,7 @@
 
 @{
     ViewData["Title"] = "Solicitar Crédito";
-    var analiseCredito = ViewBag.FinanciamentoAnalise as List<FinanciamentoAnalise>;
+    var analiseCredito = ViewBag.ErrorMsg as List<String>;
     var isSuccess = ViewBag.IsSuccess as bool?;
     var valorJuros = ViewBag.valorJuros;
     var totalCJuros = ViewBag.totalCJuros;
@@ -45,7 +45,7 @@
             </div>
 
             @{
-                var validacaoMsg = ViewBag.FinanciamentoAnalise as List<FinanciamentoAnalise>;
+                var validacaoMsg = ViewBag.ErrorMsg as List<string>;
             }
 
             @if (validacaoMsg != null && validacaoMsg.Any())
@@ -55,7 +55,7 @@
                     <ul>
                         @foreach (var msg in validacaoMsg)
                         {
-                            <li>@msg.ErrorMsg</li>
+                            <li>@msg</li>
                         }
                     </ul>
                 </div>

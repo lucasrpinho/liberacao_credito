@@ -10,6 +10,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("ctx")));
 builder.Services.AddScoped<FinanciamentoService>();
+builder.Services.AddScoped<ClienteService>();
 
 var app = builder.Build();
 

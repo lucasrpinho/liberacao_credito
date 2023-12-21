@@ -1,0 +1,74 @@
+﻿@model liberacao_credito.Models.Cliente
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Cliente</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="CPF" class="control-label"></label>
+                <input asp-for="CPF" class="form-control" oninput="formatarCPF(this)" maxlength="14" />
+                <span asp-validation-for="CPF" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Nome" class="control-label"></label>
+                <input asp-for="Nome" class="form-control" />
+                <span asp-validation-for="Nome" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="UF" class="control-label"></label>
+                <input asp-for="UF" class="form-control" />
+                <span asp-validation-for="UF" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Telefone" class="control-label"></label>
+                <input asp-for="Telefone" class="form-control" oninput="formatarTelefone(this)" maxlength="15" />
+                <span asp-validation-for="Telefone" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-4">
+                <input type="submit" value="Adicionar" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Voltar a lista</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        function formatarCPF(input) {
+            var cpf = input.value.replace(/\D/g, '');
+
+            if (cpf.length > 3) {
+                cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
+            }
+            if (cpf.length > 6) {
+                cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
+            }
+            if (cpf.length > 9) {
+                cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            }
+            input.value = cpf;
+        }
+        function formatarTelefone(input) {
+        var telefone = input.value.replace(/\D/g, '');
+        if (telefone.length === 10) {
+            telefone = telefone.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+        }
+        else if (telefone.length === 11 || telefone.length === 12) {
+            telefone = telefone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+        }
+        input.value = telefone;
+    }
+    </script>
+}

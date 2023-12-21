@@ -1,0 +1,111 @@
+﻿@using static liberacao_credito.Controllers.FinanciamentoController;
+@model liberacao_credito.Models.Financiamento
+
+@{
+    ViewData["Title"] = "Solicitar Crédito";
+    var analiseCredito = ViewBag.FinanciamentoAnalise as List<FinanciamentoAnalise>;
+    var isSuccess = ViewBag.IsSuccess as bool?;
+    var valorJuros = ViewBag.valorJuros;
+    var totalCJuros = ViewBag.totalCJuros;
+}
+
+<h1 class="text-center">Solicitar Crédito</h1>
+
+<h4 class="text-center mt-2">Financiamento</h4>
+<hr />
+<div class="form-row">
+    <div class="col-md-6 mx-auto rounded border p-3">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group col mb-3">
+                <label asp-for="CPF" class="control-label"></label>
+                <select asp-for="CPF" class ="form-control" asp-items="ViewBag.CPF"></select>
+            </div>
+            <div class="form-group col mb-3">
+                <label asp-for="ValorTotal" class="control-label">Valor do Crédito</label>
+                <input asp-for="ValorTotal" class="form-control" />
+                <span asp-validation-for="ValorTotal" class="text-danger"></span>
+            </div>
+            <div class="form-group col mb-3">
+                <label asp-for="QtdParcelas" class="control-label">Quantidade de Parcelas</label>
+                <input asp-for="QtdParcelas" class="form-control" />
+                <span asp-validation-for="QtdParcelas" class="text-danger"></span>
+            </div>
+            <div class="form-group col mb-3">
+                <label asp-for="DataVencimentoPrimeiro" class="control-label">Data do Primeiro Vencimento</label>
+                <input asp-for="DataVencimentoPrimeiro" class="form-control" />
+                <span asp-validation-for="DataVencimentoPrimeiro" class="text-danger"></span>
+            </div>
+            <div class="form-group col mb-3">
+                <label asp-for="TipoCreditoId" class="control-label">Tipo de Crédito</label>
+                <select asp-for="TipoCreditoId" class ="form-control" asp-items="ViewBag.TipoCreditoId"></select>
+            </div>
+            <div class="form-group col-6 mx-auto mb-3">
+                <input type="submit" id="btnConfirm" value="Solicitar Crédito" class="btn btn-primary form-control" />
+            </div>
+
+            @{
+                var validacaoMsg = ViewBag.FinanciamentoAnalise as List<FinanciamentoAnalise>;
+            }
+
+            @if (validacaoMsg != null && validacaoMsg.Any())
+            {
+                <div class="col alert alert-warning mt-3">
+                    <h3 class="text-danger mb-2">Crédito recusado!</h3>
+                    <ul>
+                        @foreach (var msg in validacaoMsg)
+                        {
+                            <li>@msg.ErrorMsg</li>
+                        }
+                    </ul>
+                </div>
+            }
+            
+            @if (isSuccess.HasValue && isSuccess.Value && (validacaoMsg == null || !validacaoMsg.Any()))
+            {
+                <div id="divAprovado" class="col alert alert-success mt-3">
+                    <h3>Crédito aprovado!</h3>
+                    <p>O valor total (com juros) será de: R$ @totalCJuros.ToString("C") </p>
+                    <p>O valor dos juros será de: @valorJuros.ToString("C") </p>
+                    <button id="btnFecharDiv" class="btn btn-danger">X</button>
+                </div>
+            }
+
+            <div class="col-auto mx-auto mb-3">
+                <a class="mt-3" asp-action="Index">Voltar a lista</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#btnConfirm").prop("disabled", false);
+
+            $("#btnFecharDiv").click(function (e) {
+                e.preventDefault();
+                $("#divAprovado").hide();
+
+                $("#btnConfirm").prop("disabled", false);
+
+                LimparCampos();
+            });
+
+            if ($("#divAprovado").is(":visible")) {
+                $("#btnConfirm").prop("disabled", true);           
+            }
+        });
+
+        function LimparCampos() {
+            $("#CPF").val('');
+            $("#ValorTotal").val('');
+            $("#QtdParcelas").val('');
+            $("#DataVencimentoPrimeiro").val('');
+            $("#TipoCreditoId").val('');
+        }
+    </script>
+}

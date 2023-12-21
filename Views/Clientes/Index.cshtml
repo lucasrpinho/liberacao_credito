@@ -1,4 +1,4 @@
-﻿@model IEnumerable<liberacao_credito.Models.Cliente>
+﻿@model PaginatedList<Cliente>
 
 @{
     ViewData["Title"] = "Index";
@@ -13,16 +13,16 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.CPF)
+                CPF
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Nome)
+                Nome
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.UF)
+                UF
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Telefone)
+                Telefone
             </th>
             <th></th>
         </tr>
@@ -51,3 +51,19 @@
 }
     </tbody>
 </table>
+
+@{
+    var prevDisabled = !Model.PreviousPage ? "disabled" : "";
+    var nextDisabled = !Model.NextPage ? "disabled" : "";
+}
+
+<a asp-action="Index"
+    asp-route-pageNumber="@(Model.PageIndex - 1)"
+    class="btn btn-default @prevDisabled">
+    <
+</a>
+<a asp-action="Index"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   class="btn btn-default @nextDisabled">
+    >
+</a>
